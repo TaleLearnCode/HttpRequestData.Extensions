@@ -92,6 +92,7 @@ namespace TaleLearnCode
 		/// <returns>A <see cref="HttpResponseData"/> with a status of Internal Server Error (500) and a response body with the message from <paramref name="exception"/>.</returns>
 		public static HttpResponseData CreateErrorResponseAsync(this HttpRequestData httpRequestData, Exception exception)
 		{
+			if (exception == default) throw new ArgumentNullException(nameof(exception));
 			HttpResponseData response = httpRequestData.CreateResponse(HttpStatusCode.InternalServerError);
 			response.WriteString(exception.Message);
 			return response;
