@@ -11,6 +11,12 @@
     <Description>Provides extensions to the Microsoft.Azure.Functions.Worker.Http.HttpRequestData type.</Description>
     <Copyright>Copyright ©2021 by Green Events &amp; Technology, LLC.  All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/TaleLearnCode/HttpRequestData.Extensions</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/TaleLearnCode/HttpRequestData.Extensions</RepositoryUrl>
+    <PackageReleaseNotes>Initial beta release</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Azure Functions</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
