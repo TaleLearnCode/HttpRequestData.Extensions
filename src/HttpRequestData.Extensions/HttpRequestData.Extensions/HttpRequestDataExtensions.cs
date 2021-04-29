@@ -17,6 +17,20 @@ namespace TaleLearnCode
 	{
 
 		/// <summary>
+		/// Creates a response with the provided body text.
+		/// </summary>
+		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
+		/// <param name="httpStatusCode">The HTTP status code to return in the response.</param>
+		/// <param name="bodyText">The text of the response body.</param>
+		/// <returns>A <see cref="HttpResponseData"/> representing the response with the <paramref name="bodyText"/> in the body.</returns>
+		public static HttpResponseData CreateResponse(this HttpRequestData httpRequestData, HttpStatusCode httpStatusCode, string bodyText)
+		{
+			HttpResponseData response = httpRequestData.CreateResponse(httpStatusCode);
+			response.WriteString(bodyText);
+			return response;
+		}
+
+		/// <summary>
 		/// Creates a response with a body for the provided <see cref="HttpRequestData"/>.
 		/// </summary>
 		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
