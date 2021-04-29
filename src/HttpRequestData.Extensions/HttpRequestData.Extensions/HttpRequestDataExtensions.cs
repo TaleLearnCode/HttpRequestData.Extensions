@@ -153,7 +153,7 @@ namespace TaleLearnCode
 				if (requestObject == null) throw new HttpRequestDataException("The request body is not correctly formatted.");
 			}
 
-			if (queryValuesAvailalbe || routeValues.Any())
+			if (queryValuesAvailalbe || (routeValues != default && routeValues.Any()))
 				foreach (PropertyInfo propertyInfo in typeof(T).GetProperties())
 					if (propertyInfo.CanWrite)
 					{
