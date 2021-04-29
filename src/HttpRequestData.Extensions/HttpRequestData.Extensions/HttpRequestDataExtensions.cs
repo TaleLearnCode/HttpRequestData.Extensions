@@ -17,6 +17,20 @@ namespace TaleLearnCode
 	{
 
 		/// <summary>
+		/// Creates a response with the provided body text.
+		/// </summary>
+		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
+		/// <param name="httpStatusCode">The HTTP status code to return in the response.</param>
+		/// <param name="bodyText">The text of the response body.</param>
+		/// <returns>A <see cref="HttpResponseData"/> representing the response with the <paramref name="bodyText"/> in the body.</returns>
+		public static HttpResponseData CreateResponse(this HttpRequestData httpRequestData, HttpStatusCode httpStatusCode, string bodyText)
+		{
+			HttpResponseData response = httpRequestData.CreateResponse(httpStatusCode);
+			response.WriteString(bodyText);
+			return response;
+		}
+
+		/// <summary>
 		/// Creates a response with a body for the provided <see cref="HttpRequestData"/>.
 		/// </summary>
 		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
@@ -79,8 +93,7 @@ namespace TaleLearnCode
 		/// </summary>
 		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
 		/// <returns>A <see cref="HttpResponseData"/> with a status of Internal Server Error (500).</returns>
-		public static HttpResponseData CreateErrorResponse(
-			this HttpRequestData httpRequestData)
+		public static HttpResponseData CreateErrorResponse(this HttpRequestData httpRequestData)
 		{
 			return httpRequestData.CreateResponse(HttpStatusCode.InternalServerError);
 		}
@@ -91,12 +104,33 @@ namespace TaleLearnCode
 		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
 		/// <param name="exception">The <see cref="Exception"/> causing the Internal Server Error to be returned.</param>
 		/// <returns>A <see cref="HttpResponseData"/> with a status of Internal Server Error (500) and a response body with the message from <paramref name="exception"/>.</returns>
-		public static HttpResponseData CreateErrorResponse(
-			this HttpRequestData httpRequestData,
-			Exception exception)
+		public static HttpResponseData CreateErrorResponse(this HttpRequestData httpRequestData, Exception exception)
 		{
 			if (exception == default) throw new ArgumentNullException(nameof(exception));
 			HttpResponseData response = httpRequestData.CreateResponse(HttpStatusCode.InternalServerError);
+			response.WriteString(exception.Message);
+			return response;
+		}
+
+		/// <summary>
+		/// Creates a bad request response.
+		/// </summary>
+		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
+		/// <returns>A <see cref="HttpResponseData"/> with a status of Bad Request (400).</returns>
+		public static HttpResponseData CreateBadRequestResponse(this HttpRequestData httpRequestData)
+		{
+			return httpRequestData.CreateResponse(HttpStatusCode.BadRequest);
+		}
+
+		/// <summary>
+		/// Creates a bad request response with the exception message included.
+		/// </summary>
+		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
+		/// <param name="exception">The <see cref="Exception"/> causing the Internal Server Error to be returned.</param>
+		/// <returns>A <see cref="HttpResponseData"/> with a status of Bad Request (400) and a response body with the message from <paramref name="exception"/>.</returns>
+		public static HttpResponseData CreateBadRequestResponse(this HttpRequestData httpRequestData, Exception exception)
+		{
+			HttpResponseData response = httpRequestData.CreateResponse(HttpStatusCode.BadRequest);
 			response.WriteString(exception.Message);
 			return response;
 		}
@@ -108,8 +142,7 @@ namespace TaleLearnCode
 		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> to be interrogated for the request object.</param>
 		/// <returns>A <typeparamref name="T"/> representing the request object from the request.</returns>
 		/// <exception cref="HttpRequestDataException">Thrown if there is an error reading the request object from the request.</exception>
-		public static Task<T> GetRequestParametersAsync<T>(
-			this HttpRequestData httpRequestData) where T : new()
+		public static Task<T> GetRequestParametersAsync<T>(this HttpRequestData httpRequestData) where T : new()
 		{
 			return GetRequestParametersAsync<T>(httpRequestData, new Dictionary<string, string>(), new JsonSerializerOptions());
 		}
@@ -122,9 +155,7 @@ namespace TaleLearnCode
 		/// <param name="routeValues">Any route values supplied to the Azure Function.</param>
 		/// <returns>A <typeparamref name="T"/> representing the request object from the request.</returns>
 		/// <exception cref="HttpRequestDataException">Thrown if there is an error reading the request object from the request.</exception>
-		public static Task<T> GetRequestParametersAsync<T>(
-			this HttpRequestData httpRequestData,
-			Dictionary<string, string> routeValues) where T : new()
+		public static Task<T> GetRequestParametersAsync<T>(this HttpRequestData httpRequestData, Dictionary<string, string> routeValues) where T : new()
 		{
 			return GetRequestParametersAsync<T>(httpRequestData, routeValues, new JsonSerializerOptions());
 		}
