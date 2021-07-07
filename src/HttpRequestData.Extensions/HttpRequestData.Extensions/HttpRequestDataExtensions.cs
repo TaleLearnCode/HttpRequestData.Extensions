@@ -205,7 +205,7 @@ namespace TaleLearnCode
 
 			string queryString = httpRequestData.Url.Query;
 			NameValueCollection queryValues = HttpUtility.ParseQueryString(queryString);
-			bool queryValuesAvailalbe = (queryValues.Count == 1 && queryValues.GetKey(0).ToLower() != "code") || queryValues.Count > 1;
+			bool queryValuesAvailalbe = (queryValues.Count == 1 && queryValues.GetKey(0) != null && queryValues.GetKey(0).ToLower() != "code") || queryValues.Count > 1;
 
 			if (httpRequestData.Body == Stream.Null && !queryValuesAvailalbe && (routeValues == default || !routeValues.Any()))
 				throw new HttpRequestDataException("There are no query string values, no route values, or the request body is missing or it is unreadable.");
