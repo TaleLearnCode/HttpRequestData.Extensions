@@ -136,6 +136,19 @@ namespace TaleLearnCode
 		}
 
 		/// <summary>
+		/// Creates a created (HTTP status code 201) response with the Content-Location header value.
+		/// </summary>
+		/// <param name="httpRequestData">The <see cref="HttpRequestData"/> for this response.</param>
+		/// <param name="contentLocation">The value of the Content-Location header value.</param>
+		/// <returns>A <see cref="HttpResponseData"/> with a status of Created (201) and a Content-Location header value.</returns>
+		public static HttpResponseData CreateCreatedResponse(this HttpRequestData httpRequestData, string contentLocation)
+		{
+			HttpResponseData response = httpRequestData.CreateResponse(HttpStatusCode.Created);
+			response.Headers.Add("Content-Location", contentLocation);
+			return response;
+		}
+
+		/// <summary>
 		/// Get a request object from the provide <see cref="HttpRequestData"/>.
 		/// </summary>
 		/// <typeparam name="T">The type of the request object to be returned.</typeparam>
@@ -194,7 +207,7 @@ namespace TaleLearnCode
 			NameValueCollection queryValues = HttpUtility.ParseQueryString(queryString);
 			bool queryValuesAvailalbe = (queryValues.Count == 1 && queryValues.GetKey(0).ToLower() != "code") || queryValues.Count > 1;
 
-			if (httpRequestData.Body == Stream.Null && !queryValuesAvailalbe && (routeValues != default || !routeValues.Any()))
+			if (httpRequestData.Body == Stream.Null && !queryValuesAvailalbe && (routeValues == default || !routeValues.Any()))
 				throw new HttpRequestDataException("There are no query string values, no route values, or the request body is missing or it is unreadable.");
 
 			T requestObject = default;
@@ -205,22 +218,36 @@ namespace TaleLearnCode
 				if (requestObject == null) throw new HttpRequestDataException("The request body is not correctly formatted.");
 			}
 
-			if (queryValuesAvailalbe || (routeValues != default && routeValues.Any()))
+			Dictionary<string, string> loweredRouteValues = default;
+			if (routeValues != default && routeValues.Any())
+			{
+				loweredRouteValues = new();
+				foreach (KeyValuePair<string, string> routeValue in routeValues)
+					loweredRouteValues.Add(routeValue.Key.ToLower(), routeValue.Value);
+			}
+
+			if (queryValuesAvailalbe || (loweredRouteValues != default && loweredRouteValues.Any()))
 				foreach (PropertyInfo propertyInfo in typeof(T).GetProperties())
 					if (propertyInfo.CanWrite)
 					{
 						if (queryValuesAvailalbe)
 							foreach (string key in queryValues.AllKeys)
 								if (key.ToLower() == propertyInfo.Name.ToLower())
+								{
+									if (requestObject == null) requestObject = new();
 									if (propertyInfo.PropertyType == typeof(int) || propertyInfo.PropertyType == typeof(int?))
 										propertyInfo.SetValue(requestObject, Convert.ToInt32(queryValues[key]));
 									else
 										propertyInfo.SetValue(requestObject, queryValues[key]);
-						if (routeValues.TryGetValue(propertyInfo.Name.ToLower(), out string routeValue))
+								}
+						if (loweredRouteValues != default && loweredRouteValues.Any() && loweredRouteValues.TryGetValue(propertyInfo.Name.ToLower(), out string routeValue))
+						{
+							if (requestObject == null) requestObject = new();
 							if (propertyInfo.PropertyType == typeof(int) || propertyInfo.PropertyType == typeof(int?))
 								propertyInfo.SetValue(requestObject, Convert.ToInt32(routeValue));
 							else
 								propertyInfo.SetValue(requestObject, routeValue);
+						}
 					}
 
 			if (requestObject == null) throw new HttpRequestDataException("The request body is not correctly formatted.");
